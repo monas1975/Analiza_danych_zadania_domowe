@@ -206,3 +206,56 @@ lines(USPop$year,fitted(model.nlm),col='blue')
 predict(model.nlm, data.frame(year = 2015)) # 306mln vs 321 according Internet
 predict(model.nlm, data.frame(year = 2018)) # 312mln vs 327 according Internet
 
+############################################################################################
+##                        ZADANIE 6                                                   #####
+###########################################################################################
+
+#6. Skoczek skacze ze spadochronem z balonu napełnionego goracym powietrzem. Ponizej
+#znajduja sie jego predkosci [m/s] w kolejnych chwilach czasu [s] (poczynajac od 1s): 10,
+##16,3, 23, 27,5, 31, 35,6, 39, 41,5, 42,9, 45, 46, 45,5, 46, 49, 50. Dopasuj do tych danych
+#model:
+#  v(t) = a*t / (b+t)
+
+#Narysuj wykres rozrzutu wraz z dopasowana krzywa regresji. Jaka predkosc rozwinie w
+#17 sekundzie lotu?
+ 
+v<-c(16.3, 23.0, 27.5, 31.0, 35.6, 39.0, 41.5, 42.9, 45.0, 46.0, 45.5, 46.0, 49.0, 50.0)
+t<-c(1:14)
+lot=data.frame(v,t)
+
+#wykres rozrzutu
+plot(v~t,data = lot, pch=20)
+
+#buduje model nieliniowy
+# v(t) = a*t / (b+t) --- > SSmicmen
+?SSmicmen
+model.nlm <- nls(v~SSmicmen(t,Vm,K),data=lot)
+
+
+lines(lot$t,fitted(model.nlm),col='blue')
+
+predict(model.nlm, data.frame(t = 2)) # w danych bylo 23.0 vs obliczone 22,509
+predict(model.nlm, data.frame(t = 6)) # w danych bylo 39.0 vs obliczone 38.84
+
+
+predict(model.nlm, data.frame(t = 17)) # 50.75
+
+#Odp. Przewidywaa predkosc w 17s to 50,75 [m/s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
