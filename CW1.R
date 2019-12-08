@@ -194,6 +194,15 @@ summary(model.lm)
 
 library(car)
 ?USPop
+?SSlogis
+?plot
 USPop
 
+plot(USPop,pch=20)
+model.nlm<-nls(population ~ SSlogis(year,Asym,xmid,scal),data=USPop)
+summary(model.nlm)
+lines(USPop$year,fitted(model.nlm),col='blue')
+#predict
+predict(model.nlm, data.frame(year = 2015)) # 306mln vs 321 according Internet
+predict(model.nlm, data.frame(year = 2018)) # 312mln vs 327 according Internet
 
