@@ -33,7 +33,9 @@ abline(model.lm, lwd = 2, col = 'red')
 
 
 #kwadratowa <-lm(dist ~ 1 + speed + I(speed^2), data = data.set)
-#plot(dist ~ speed, data = cars, pch = 20, main=eq)
+quadratic <-lm(dist ~ 1 + speed + I(speed^2), data = data.set)
+points(data.set$speed, predict(quadratic), type="l",lwd=2,col='blue')
+
 
 ########################################################################################
 ##                       ZADANIE 2                                                  ####
@@ -198,10 +200,20 @@ library(car)
 ?plot
 USPop
 
+# rozwiazanie z uzyciem funkcji samostartujacej SSlogis
 plot(USPop,pch=20)
 model.nlm<-nls(population ~ SSlogis(year,Asym,xmid,scal),data=USPop)
 summary(model.nlm)
 lines(USPop$year,fitted(model.nlm),col='blue')
+#predict
+predict(model.nlm, data.frame(year = 2015)) # 306mln vs 321 according Internet
+predict(model.nlm, data.frame(year = 2018)) # 312mln vs 327 according Internet
+
+#lub rozwiazanie bez uzycia funkcji samostartujacej 
+plot(USPop,pch=20)
+model.nls <- nls(population~I(a/(1+exp^(b-x)/c)), data = lot, start = list(a=1,b=1,c=1))
+summary(model)
+curve(coef(model.nlm)[1] / (1+exp(1)^((coef(model.nlm)[2] - x)/coef(model.nlm)[3])),,add=TRUE,col='blue')
 #predict
 predict(model.nlm, data.frame(year = 2015)) # 306mln vs 321 according Internet
 predict(model.nlm, data.frame(year = 2018)) # 312mln vs 327 according Internet
@@ -219,14 +231,14 @@ predict(model.nlm, data.frame(year = 2018)) # 312mln vs 327 according Internet
 #Narysuj wykres rozrzutu wraz z dopasowana krzywa regresji. Jaka predkosc rozwinie w
 #17 sekundzie lotu?
  
-v<-c(16.3, 23.0, 27.5, 31.0, 35.6, 39.0, 41.5, 42.9, 45.0, 46.0, 45.5, 46.0, 49.0, 50.0)
-t<-c(1:14)
-lot=data.frame(v,t)
+v<-c(10.0, 16.3, 23.0, 27.5, 31.0, 35.6, 39.0, 41.5, 42.9, 45.0, 46.0, 45.5, 46.0, 49.0, 50.0)
+t<-c(1:15)
+lot=data.frame(t,v)
 
 #wykres rozrzutu
 plot(v~t,data = lot, pch=20)
 
-#buduje model nieliniowy
+#buduje model nieliniowy z wykorzystaniem samosterujacej funkcji SSmicmen
 # v(t) = a*t / (b+t) --- > SSmicmen
 ?SSmicmen
 model.nlm <- nls(v~SSmicmen(t,Vm,K),data=lot)
@@ -234,18 +246,34 @@ model.nlm <- nls(v~SSmicmen(t,Vm,K),data=lot)
 
 lines(lot$t,fitted(model.nlm),col='blue')
 
-predict(model.nlm, data.frame(t = 2)) # w danych bylo 23.0 vs obliczone 22,509
-predict(model.nlm, data.frame(t = 6)) # w danych bylo 39.0 vs obliczone 38.84
+predict(model.nlm, data.frame(t = 2)) # w danych bylo 16.3 vs obliczone 17.52
+predict(model.nlm, data.frame(t = 6)) # w danych bylo 35.6 vs obliczone 35.05
 
 
-predict(model.nlm, data.frame(t = 17)) # 50.75
+predict(model.nlm, data.frame(t = 17)) # 51.84
 
-#Odp. Przewidywaa predkosc w 17s to 50,75 [m/s]
+#Odp. Przewidywaa predkosc w 17s to 51,84 [m/s]
+
+#lub bez uzycia fukcji samostartujacych
+
+v<-c(10.0, 16.3, 23.0, 27.5, 31.0, 35.6, 39.0, 41.5, 42.9, 45.0, 46.0, 45.5, 46.0, 49.0, 50.0)
+t<-c(1:15)
+lot=data.frame(t,v)
+#wykres rozrzutu
+plot(v~t,data.set, pch=20)
+
+model.nls <- nls(v~I((a * t) / (b + t)), data = lot, start = list(a=1,b=1))
+summary(model)
+?curve
+eq <- paste0("y = ",coef(model.nls)[1],"*x / (", coef(model.nls)[2], "+x )")
+curve((coef(model.nls)[1]*x)/(coef(model.nls)[2]+x),add=TRUE,col='blue')
+ 
+
+predict(model.nlm, data.frame(t = 2)) # w danych bylo 16.3 vs obliczone 17.52
+predict(model.nlm, data.frame(t = 6)) # w danych bylo 35.6 vs obliczone 35.05
 
 
-
-
-
+predict(model.nlm, data.frame(t = 17)) # 51.84
 
 
 
