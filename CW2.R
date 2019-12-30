@@ -102,4 +102,38 @@ legend('left',
 #  • samochody amerykaÒskie i inne (Origin),
 #• typy samochodów (Type).
 
-#https://www.datacamp.com/community/tutorials/pca-analysis-r
+library(MASS)
+?Cars93
+?prcomp
+Cars93
+
+#z tabeli Car93 usuwam kolumny: 1 - Manufacturer, 2-Model, 3-Make, zapisuje w zmiennej tymczasowej
+temp <- Cars93[,-c(1,2,27)]
+# konwertuje wartosci kolumny Man.trans.avail do integera
+temp$Man.trans.avail <- as.integer(temp$Man.trans.avail)-1
+temp$Origin <- as.integer(temp$Origin)-1
+
+#konwertuje tabele tymczasowa, zamieniam wartosc opisowe na dyskretne
+table <- model.matrix(~., data = temp)
+table
+
+model.pca<-prcomp(table, center=TRUE)
+summary(model.pca)
+
+screeplot(model.pca, type = 'l', pch = 20)
+# z wykresu osypiska widac , ze na zmiennosc najwiekszy wplyw maja pierwsze 3 skladowe (trzecia - 0.999)
+
+#Porownanie samochodow amerykanskich i innych
+
+plot(model.pca$x, type = 'p', pch = 20, col = Cars93$Origin) 
+legend('bottomright', legend = unique(Cars93$Origin), col = unique(Cars93$Origin), pch = 20, bty = 'n')
+
+#z wykresu widac, ze zmienne skladowe nie układaja się w grupy w zaleznosci od kraju pochodzenia,
+#stad wnioskuje, ze zmiennosc skladowych glownych nie jest zalezna od kraju pochodzenia
+
+
+#Porownanie w zaleznisci od typu (Type)
+plot(model.pca$x, type = 'p', pch = 20, col = Cars93$Type) 
+legend('bottomright', legend = unique(Cars93$Type), col = unique(Cars93$Type), pch = 20, bty = 'n')
+# tutaj rowniez cięzko stwierdzic by skladowe grupowaly sie w zaleznosci od typu samochodow,
+
