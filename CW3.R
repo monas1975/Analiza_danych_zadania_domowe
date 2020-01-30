@@ -93,6 +93,30 @@ errorest(Class ~ .,data=Vehicle, model=NaiveBayes, estimator='boot', predict=fun
 #  dla tego typu zbioru danych
 
 # d) wykres
-     plot(classification.qda$x,pch=20, col=Vehicle$Class)
+     plot(clasyfication.lda$x, pch=20, col = Vehicle$Class)
+     legend('topright',pch=20, legend = unique(Vehicle$Class),col = Vehicle$Class)
+     x<-seq(-10,10,length = 100)
+     y<-seq(-10,10,length = 100)
+     grid<-expand.grid(LD1=x,LD2=y) 
+     
+     #uzywajac metody predict wykonujemy klasyfikacje obiektow ze zbioru testowego
+     Z.LDA <-predict(model.lda)
+     # predict(model.lda)$class - wskazuje przewidziana klase
+     dane<-data.frame(Vehicle=predict(model.lda)$class, predict(model.lda)$x)
+     
+     fit<-lda(Vehicle ~ LD1 + LD2, data = dane, prior=rep(1,4)/4)
+     p<-predict(fit,newdata=grid)
+     
+     # granice rozdzialu pomiedzy klasami
+     # $posterior okresla wyznaczone prawdopodobienstwo przynaleznosci do
+     z1.LDA <- p$posterior[, 1] - pmax(p$posterior[, 2], p$posterior[, 3])
+     z2.LDA <- p$posterior[, 2] - pmax(p$posterior[, 1], p$posterior[, 3])
+     z3.LDA <- p$posterior[, 3] - pmax(p$posterior[, 1], p$posterior[,2 ])
+     
+     #kreslenie granic podzialu
+     contour(x, y, matrix(z1.LDA, 100),level = 0, add = TRUE, lwd = 2)
+     contour(x, y, matrix(z2.LDA, 100),level = 0, add = TRUE, lwd = 2)
+     contour(x, y, matrix(z3.LDA, 100),level = 0, add = TRUE,  lwd = 2)
+     
 
 
